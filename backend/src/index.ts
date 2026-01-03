@@ -1,27 +1,32 @@
 import express from "express";
+import cors from "cors";
 import authRouter from "./routes/auth.routes";
 import collegeRouter from "./routes/college.routes";
 import mentorRouter from "./routes/mentor.routes";
+
 const app = express();
-import cors from "cors"
 
+// CORS middleware - this handles preflight automatically
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Body parser
 app.use(express.json());
-app.use(cors());
 
-
+// Routes
 app.get("/", (req, res) => {
-    res.status(200).json({
-        message: "Welcome to api"
-    });
+    res.json({ message: "Welcome" });
 });
 
-app.use("/api/v1/auth", authRouter)
-app.use("/api/v1/college", collegeRouter)
-app.use("/api/v1/mentor",mentorRouter);
-
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/college", collegeRouter);
+app.use("/api/v1/mentor", mentorRouter);
 
 app.listen(8080, () => {
-    console.log("Server is running at 8080");
-})
-
-
+    console.log("Server running on http://localhost:8080");
+    console.log("CORS enabled for http://localhost:3000");
+});
