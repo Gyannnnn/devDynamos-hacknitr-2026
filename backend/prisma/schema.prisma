@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum USER {
+  User
+  Mentor
+  Admin
+}
+
+enum FOE {
+  WEB_DEVELOPEMENT
+  ANDROID_DEVELOPMENT
+  IOS_DEVELOPMENT
+  OPERATING_SYSTEM
+  CYBER_SECURITY
+  COMPILER_DESIGN
+  COMPUTER_NETWORK
+  THEORY_OF_COMPUTATION
+  AIML
+}
+
+model College {
+  id   String @id @default(uuid())
+  name String @unique
+
+  users User[]
+}
+
+model User {
+  id       String  @id @default(uuid())
+  name     String
+  email    String  @unique
+  password String
+  avatar   String?
+
+  collegeId String
+  college   College @relation(fields: [collegeId], references: [id])
+
+  location         String
+  fieldOfExpertise FOE?
+  description      String?
+  about            String?
+  role             USER
+  instagram        String?
+  linkedIn         String?
+
+  materialLinks String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  followingMentors User[] @relation("UserFollowsMentor")
+  followers        User[] @relation("UserFollowsMentor")
+
+  userConversations   Conversation[] @relation("UserConversations")
+  mentorConversations Conversation[] @relation("MentorConversations")
+
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+}
+
+model Meet {
+  id       String   @id @default(uuid())
+  mentorId String
+  menteeId String
+  date     DateTime
+  content  String
+
+  createdAt DateTime @default(now())
+}
+
+model Conversation {
+  id String @id @default(uuid())
+
+  userId   String
+  mentorId String
+
+  user   User @relation("UserConversations", fields: [userId], references: [id])
+  mentor User @relation("MentorConversations", fields: [mentorId], references: [id])
+
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, mentorId])
+}
+
+model Message {
+  id             String @id @default(uuid())
+  conversationId String
+
+  senderId   String
+  receiverId String
+
+  content String
+  isRead  Boolean @default(false)
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  sender       User         @relation("SentMessages", fields: [senderId], references: [id])
+  receiver     User         @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  createdAt DateTime @default(now())
+}
