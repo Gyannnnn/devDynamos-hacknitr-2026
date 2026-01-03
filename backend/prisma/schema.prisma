@@ -47,7 +47,7 @@ model User {
   fieldOfExpertise FOE?
   description      String?
   about            String?
-  role             USER
+  role             USER   @default(User)
   instagram        String?
   linkedIn         String?
 

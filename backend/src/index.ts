@@ -3,8 +3,10 @@ import authRouter from "./routes/auth.routes";
 import collegeRouter from "./routes/college.routes";
 import mentorRouter from "./routes/mentor.routes";
 const app = express();
+import cors from "cors"
 
 app.use(express.json());
+app.use(cors());
 
 
 app.get("/", (req, res) => {
