@@ -1,30 +1,50 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Label } from "@/components/ui/label"
-import { allFields, type FieldOfGuidance } from "@/lib/data"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
+import { Signup } from "../api/actions/signup";
+
+const FIELD_OF_EXPERTISE = [
+  "WEB_DEVELOPEMENT",
+  "AIML",
+  "OPERATING_SYSTEM",
+  "ANDROID_DEVELOPEMENT",
+  "DATA_STRUCTURES",
+  "SYSTEM_DESIGN",
+  "SOFT_SKILLS",
+  "ACADEMICS",
+] as const;
+
+type FieldOfExpertise = (typeof FIELD_OF_EXPERTISE)[number];
 
 export default function SignUpPage() {
-  const router = useRouter()
-  const [role, setRole] = useState<"student" | "mentor">("student")
+  const router = useRouter();
+  const [role, setRole] = useState<"student" | "mentor">("student");
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     collegeName: "",
     location: "",
-    fields: [] as FieldOfGuidance[],
+    fields: [] as FieldOfExpertise[],
     description: "",
     bio: "",
     studyMaterials: [""],
@@ -33,27 +53,53 @@ export default function SignUpPage() {
       instagram: "",
       linkedin: "",
     },
-  })
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Dummy submission - just navigate
-    alert(`${role === "student" ? "Student" : "Mentor"} account created successfully!`)
-    router.push("/")
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      await Signup({
+        name: formData.name,
+        email: formData.email,
+        password: "dummy-password",
+        collegeId: formData.collegeName,
+
+        location: role === "mentor" ? formData.location : "",
+        fieldOfExpertise:
+          role === "mentor" ? formData.fields[0] ?? "" : "",
+
+        description: role === "mentor" ? formData.description : "",
+        about: role === "mentor" ? formData.bio : "",
+        role,
+
+        instagram: formData.socialLinks.instagram,
+        linkedIn: formData.socialLinks.linkedin,
+
+        materialLinks:
+          role === "mentor" ? formData.studyMaterials : [],
+      });
+
+      alert("Account created successfully!");
+      router.push("/");
+    } catch (error) {
+      console.error("Signup failed", error);
+      alert("Signup failed. Check console.");
+    }
+  };
 
   const addStudyMaterial = () => {
-    setFormData({
-      ...formData,
-      studyMaterials: [...formData.studyMaterials, ""],
-    })
-  }
+    setFormData((prev) => ({
+      ...prev,
+      studyMaterials: [...prev.studyMaterials, ""],
+    }));
+  };
 
   const updateStudyMaterial = (index: number, value: string) => {
-    const updated = [...formData.studyMaterials]
-    updated[index] = value
-    setFormData({ ...formData, studyMaterials: updated })
-  }
+    const updated = [...formData.studyMaterials];
+    updated[index] = value;
+    setFormData({ ...formData, studyMaterials: updated });
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
@@ -64,174 +110,153 @@ export default function SignUpPage() {
             Create an account to connect with mentors or students
           </CardDescription>
         </CardHeader>
+
         <CardContent>
-          <Tabs value={role} onValueChange={(v) => setRole(v as "student" | "mentor")}>
+          <Tabs value={role} onValueChange={(v) => setRole(v as any)}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="student">Student</TabsTrigger>
               <TabsTrigger value="mentor">Mentor</TabsTrigger>
             </TabsList>
 
+            {/* STUDENT */}
             <TabsContent value="student">
               <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="college">College Name</Label>
-                  <Input
-                    id="college"
-                    required
-                    value={formData.collegeName}
-                    onChange={(e) => setFormData({ ...formData, collegeName: e.target.value })}
-                  />
-                </div>
+                <Input
+                  placeholder="Name"
+                  required
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                />
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  required
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                />
+                <Input
+                  placeholder="College Name"
+                  required
+                  value={formData.collegeName}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      collegeName: e.target.value,
+                    })
+                  }
+                />
                 <Button type="submit" className="w-full">
                   Sign Up as Student
                 </Button>
               </form>
             </TabsContent>
 
+            {/* MENTOR */}
             <TabsContent value="mentor">
               <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="mentor-name">Name</Label>
-                  <Input
-                    id="mentor-name"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="mentor-email">Email</Label>
-                  <Input
-                    id="mentor-email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="mentor-college">College / University</Label>
-                  <Input
-                    id="mentor-college"
-                    required
-                    value={formData.collegeName}
-                    onChange={(e) => setFormData({ ...formData, collegeName: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    required
-                    value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="field">Field of Expertise</Label>
-                  <Select
-                    value={formData.fields[0] || ""}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, fields: [value as FieldOfGuidance] })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select field" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {allFields.map((field) => (
-                        <SelectItem key={field} value={field}>
-                          {field}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Short Description</Label>
-                  <Input
-                    id="description"
-                    required
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="bio">About / Bio</Label>
-                  <textarea
-                    id="bio"
-                    required
-                    className="w-full min-h-25 px-3 py-2 text-sm border rounded-md"
-                    value={formData.bio}
-                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  />
-                </div>
+                <Input
+                  placeholder="Name"
+                  required
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                />
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  required
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                />
+                <Input
+                  placeholder="College / University"
+                  required
+                  value={formData.collegeName}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      collegeName: e.target.value,
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Location"
+                  required
+                  value={formData.location}
+                  onChange={(e) =>
+                    setFormData({ ...formData, location: e.target.value })
+                  }
+                />
 
-                <div className="space-y-2">
-                  <Label>Social Links</Label>
+                <Select
+                  value={formData.fields[0] || ""}
+                  onValueChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      fields: [value as FieldOfExpertise],
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Field of Expertise" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FIELD_OF_EXPERTISE.map((field) => (
+                      <SelectItem key={field} value={field}>
+                        {field.replaceAll("_", " ")}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Input
+                  placeholder="Short Description"
+                  required
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      description: e.target.value,
+                    })
+                  }
+                />
+
+                <textarea
+                  className="w-full min-h-[100px] border rounded-md p-2"
+                  placeholder="About / Bio"
+                  required
+                  value={formData.bio}
+                  onChange={(e) =>
+                    setFormData({ ...formData, bio: e.target.value })
+                  }
+                />
+
+                {formData.studyMaterials.map((material, i) => (
                   <Input
-                    id="github"
-                    placeholder="GitHub username or URL"
-                    value={formData.socialLinks.github}
+                    key={i}
+                    placeholder="Study material link"
+                    value={material}
                     onChange={(e) =>
-                      setFormData({ ...formData, socialLinks: { ...formData.socialLinks, github: e.target.value } })
+                      updateStudyMaterial(i, e.target.value)
                     }
                   />
-                  <Input
-                    id="instagram"
-                    placeholder="Instagram handle or URL"
-                    value={formData.socialLinks.instagram}
-                    onChange={(e) =>
-                      setFormData({ ...formData, socialLinks: { ...formData.socialLinks, instagram: e.target.value } })
-                    }
-                  />
-                  <Input
-                    id="linkedin"
-                    placeholder="LinkedIn profile URL"
-                    value={formData.socialLinks.linkedin}
-                    onChange={(e) =>
-                      setFormData({ ...formData, socialLinks: { ...formData.socialLinks, linkedin: e.target.value } })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Study Material Links</Label>
-                  {formData.studyMaterials.map((material, index) => (
-                    <Input
-                      key={index}
-                      placeholder="Enter study material URL"
-                      value={material}
-                      onChange={(e) => updateStudyMaterial(index, e.target.value)}
-                    />
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={addStudyMaterial}
-                    className="w-full"
-                  >
-                    Add Another Link
-                  </Button>
-                </div>
+                ))}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addStudyMaterial}
+                >
+                  Add another link
+                </Button>
+
                 <Button type="submit" className="w-full">
                   Sign Up as Mentor
                 </Button>
@@ -241,6 +266,5 @@ export default function SignUpPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-
