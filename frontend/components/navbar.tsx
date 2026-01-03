@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -12,10 +13,22 @@ import { User } from "lucide-react"
 
 export function Navbar() {
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 ">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="text-xl font-semibold">
-          MentorConnect
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          {/* Logo Image */}
+          <Image
+            src="/logo.jpg"
+            alt="MentorConnect Logo"
+            width={40}
+            height={40}
+            className="shrink-0 "
+            priority
+          />
+          {/* Text */}
+          <span className="text-2xl font-bold" style={{ fontFamily: "var(--font-dm-sans)" }}>
+            MentorConnect
+          </span>
         </Link>
         
         <div className="flex items-center gap-4">

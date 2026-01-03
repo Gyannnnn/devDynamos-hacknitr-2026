@@ -32,7 +32,7 @@ export default function HomePage() {
 
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
         <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-          <SelectTrigger className="w-full sm:w-[200px]">
+          <SelectTrigger className="w-full sm:w-50">
             <SelectValue placeholder="Filter by Location" />
           </SelectTrigger>
           <SelectContent>
@@ -46,7 +46,7 @@ export default function HomePage() {
         </Select>
 
         <Select value={selectedField} onValueChange={setSelectedField}>
-          <SelectTrigger className="w-full sm:w-[200px]">
+          <SelectTrigger className="w-full sm:w-50">
             <SelectValue placeholder="Filter by Field" />
           </SelectTrigger>
           <SelectContent>

@@ -28,6 +28,9 @@ export function ChatDialog({ mentor }: ChatDialogProps) {
   const [messages, setMessages] = useState(dummyMessages)
   const [input, setInput] = useState("")
   const [open, setOpen] = useState(false)
+  const [isFollowing, setIsFollowing] = useState(false)
+
+  const toggleFollow = () => setIsFollowing((v) => !v)
 
   const handleSend = () => {
     if (!input.trim()) return
@@ -44,13 +47,15 @@ export function ChatDialog({ mentor }: ChatDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <MessageSquare className="h-4 w-4 mr-2" />
-          Chat with Mentor
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-2xl h-[600px] flex flex-col">
+      <div className="w-full">
+        <DialogTrigger asChild>
+          <Button className="w-full sm:w-auto">
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Chat with Mentor
+          </Button>
+        </DialogTrigger>
+      </div>
+      <DialogContent className="max-w-2xl h-screen flex flex-col">
         <DialogHeader>
           <DialogTitle>Chat with {mentor.name}</DialogTitle>
           <DialogDescription>
