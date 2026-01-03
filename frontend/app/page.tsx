@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import Link from "next/link";
 import { MentorCard } from "@/components/mentor-card";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -10,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Zap } from "lucide-react";
 
 type Mentor = {
   id: string;
@@ -20,6 +23,7 @@ type Mentor = {
   about: string;
   description: string;
 };
+
 type ApiResponse = {
   success: boolean;
   message: string;
@@ -39,11 +43,13 @@ export default function HomePage() {
     const fetchMentors = async () => {
       try {
         setLoading(true);
-        const response = await axios.get<ApiResponse>("http://localhost:8080/api/v1/mentor/all");
-        if (response.data.success) {
-          setMentors(response.data.data);
+        const res = await axios.get<ApiResponse>(
+          "http://localhost:8080/api/v1/mentor/all"
+        );
+        if (res.data.success) {
+          setMentors(res.data.data);
         } else {
-          setError(response.data.message || "Failed to load mentors");
+          setError(res.data.message);
         }
       } catch (err: any) {
         setError(err.message || "Something went wrong");
@@ -55,7 +61,7 @@ export default function HomePage() {
     fetchMentors();
   }, []);
 
-  // 🔹 Dynamic filter options
+  // 🔹 Dynamic filters
   const allLocations = useMemo(
     () => Array.from(new Set(mentors.map((m) => m.location))),
     [mentors]
@@ -66,12 +72,12 @@ export default function HomePage() {
     [mentors]
   );
 
-  // 🔹 Apply filters
   const filteredMentors = mentors.filter((mentor) => {
     const locationMatch =
       selectedLocation === "all" || mentor.location === selectedLocation;
     const fieldMatch =
-      selectedField === "all" || mentor.fieldOfExpertise === selectedField;
+      selectedField === "all" ||
+      mentor.fieldOfExpertise === selectedField;
 
     return locationMatch && fieldMatch;
   });
@@ -81,7 +87,9 @@ export default function HomePage() {
   }
 
   if (error) {
-    return <div className="text-center py-12 text-red-500">{error}</div>;
+    return (
+      <div className="text-center py-12 text-red-500">{error}</div>
+    );
   }
 
   return (
@@ -91,6 +99,22 @@ export default function HomePage() {
         <p className="text-muted-foreground">
           Connect with experienced mentors from your college community
         </p>
+      </div>
+
+      {/* 🔮 AI Recommendation Banner */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold flex items-center gap-2 mb-1">
+            <Zap className="h-5 w-5 text-blue-600" />
+            Find Your Perfect Mentor Match
+          </h2>
+          <p className="text-sm text-gray-600">
+            Use AI to discover mentors that match your goals and learning style
+          </p>
+        </div>
+        <Link href="/find-mentor">
+          <Button>Get AI Recommendations</Button>
+        </Link>
       </div>
 
       {/* Filters */}
@@ -126,10 +150,8 @@ export default function HomePage() {
 
       {/* Mentor Grid */}
       {filteredMentors.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            No mentors found matching your filters.
-          </p>
+        <div className="text-center py-12 text-muted-foreground">
+          No mentors found matching your filters.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
