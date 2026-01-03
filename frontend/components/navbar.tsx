@@ -24,6 +24,7 @@ export function Navbar() {
             height={40}
             className="shrink-0 "
             priority
+            unoptimized
           />
           {/* Text */}
           <span className="text-2xl font-bold" style={{ fontFamily: "var(--font-dm-sans)" }}>
