@@ -1,7 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { MentorCard } from "@/components/mentor-card"
+import { Button } from "@/components/ui/button"
 import { mentors, allLocations, allFields, type Location, type FieldOfGuidance } from "@/lib/data"
 import {
   Select,
@@ -10,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Zap } from "lucide-react"
 
 export default function HomePage() {
   const [selectedLocation, setSelectedLocation] = useState<string>("all")
@@ -28,6 +31,22 @@ export default function HomePage() {
         <p className="text-muted-foreground">
           Connect with experienced mentors from your college community
         </p>
+      </div>
+
+      {/* AI Recommendation Banner */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold flex items-center gap-2 mb-1">
+            <Zap className="h-5 w-5 text-blue-600" />
+            Find Your Perfect Mentor Match
+          </h2>
+          <p className="text-sm text-gray-600">
+            Use AI to discover mentors that match your goals and learning style
+          </p>
+        </div>
+        <Link href="/find-mentor">
+          <Button className="whitespace-nowrap">Get AI Recommendations</Button>
+        </Link>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 mb-8">

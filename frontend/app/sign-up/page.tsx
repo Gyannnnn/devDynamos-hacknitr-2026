@@ -28,6 +28,11 @@ export default function SignUpPage() {
     description: "",
     bio: "",
     studyMaterials: [""],
+    socialLinks: {
+      github: "",
+      instagram: "",
+      linkedin: "",
+    },
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -178,6 +183,34 @@ export default function SignUpPage() {
                     className="w-full min-h-25 px-3 py-2 text-sm border rounded-md"
                     value={formData.bio}
                     onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Social Links</Label>
+                  <Input
+                    id="github"
+                    placeholder="GitHub username or URL"
+                    value={formData.socialLinks.github}
+                    onChange={(e) =>
+                      setFormData({ ...formData, socialLinks: { ...formData.socialLinks, github: e.target.value } })
+                    }
+                  />
+                  <Input
+                    id="instagram"
+                    placeholder="Instagram handle or URL"
+                    value={formData.socialLinks.instagram}
+                    onChange={(e) =>
+                      setFormData({ ...formData, socialLinks: { ...formData.socialLinks, instagram: e.target.value } })
+                    }
+                  />
+                  <Input
+                    id="linkedin"
+                    placeholder="LinkedIn profile URL"
+                    value={formData.socialLinks.linkedin}
+                    onChange={(e) =>
+                      setFormData({ ...formData, socialLinks: { ...formData.socialLinks, linkedin: e.target.value } })
+                    }
                   />
                 </div>
                 <div className="space-y-2">
