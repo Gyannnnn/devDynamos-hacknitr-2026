@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -19,6 +19,12 @@ export function ScheduleDialog({ mentor }: { mentor: Mentor }) {
   const [date, setDate] = useState<Date | undefined>(undefined)
   const [open, setOpen] = useState(false)
 
+  useEffect(() => {
+    if (!open) {
+      setDate(undefined)
+    }
+  }, [open])
+
   const handleSchedule = () => {
     if (date) {
       alert(`Session scheduled with ${mentor.name} on ${format(date, "PPP")}`)
@@ -30,12 +36,12 @@ export function ScheduleDialog({ mentor }: { mentor: Mentor }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" className="w-full sm:w-auto">
           <CalendarIcon className="h-4 w-4 mr-2" />
           Schedule a Session
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-md mx-auto">
         <DialogHeader>
           <DialogTitle>Schedule a Session with {mentor.name}</DialogTitle>
           <DialogDescription>

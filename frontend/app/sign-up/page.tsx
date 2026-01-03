@@ -175,7 +175,7 @@ export default function SignUpPage() {
                   <textarea
                     id="bio"
                     required
-                    className="w-full min-h-[100px] px-3 py-2 text-sm border rounded-md"
+                    className="w-full min-h-25 px-3 py-2 text-sm border rounded-md"
                     value={formData.bio}
                     onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                   />
