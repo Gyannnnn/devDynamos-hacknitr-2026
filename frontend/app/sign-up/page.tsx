@@ -227,6 +227,13 @@ export default function SignUpPage() {
                     })
                   }
                 />
+                <Input
+                  placeholder="Linkedin Link"
+                  required
+                 
+                  
+                />
+                
 
                 <textarea
                   className="w-full min-h-[100px] border rounded-md p-2"

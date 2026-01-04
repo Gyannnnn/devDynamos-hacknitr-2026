@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { MapPin } from "lucide-react"
+import { MapPin, ExternalLink, Linkedin, Instagram, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Mentor } from "@/lib/data"
 
@@ -74,11 +74,83 @@ export function MentorCard({ mentor }: MentorCardProps) {
           {mentor.about || mentor.description}
         </p>
 
+        {/* Social Links */}
+        {(mentor.linkedIn || mentor.instagram) && (
+          <div className="flex items-center gap-2 mb-3">
+            {mentor.linkedIn && (
+              <a
+                href={mentor.linkedIn}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Linkedin className="h-4 w-4" />
+              </a>
+            )}
+            {mentor.instagram && (
+              <a
+                href={mentor.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Instagram className="h-4 w-4" />
+              </a>
+            )}
+          </div>
+        )}
+
+        {/* Material Links Preview */}
+        {mentor.materialLinks && mentor.materialLinks.length > 0 && (
+          <div className="mb-3">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+              <BookOpen className="h-3 w-3" />
+              <span>Resources ({mentor.materialLinks.length})</span>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {mentor.materialLinks.slice(0, 2).map((link, idx) => {
+                let displayText = link
+                try {
+                  const url = new URL(link)
+                  displayText = url.hostname.replace("www.", "")
+                } catch {
+                  // If not a valid URL, show truncated link
+                  displayText = link.length > 20 ? link.substring(0, 20) + "..." : link
+                }
+                return (
+                  <a
+                    key={idx}
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-primary hover:underline truncate max-w-[120px] flex items-center gap-1"
+                    onClick={(e) => e.stopPropagation()}
+                    title={link}
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    <span className="truncate">{displayText}</span>
+                  </a>
+                )
+              })}
+              {mentor.materialLinks.length > 2 && (
+                <span className="text-xs text-muted-foreground">
+                  +{mentor.materialLinks.length - 2} more
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-4">
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => setFollowing((s) => !s)}
+            onClick={(e) => {
+              e.stopPropagation()
+              setFollowing((s) => !s)
+            }}
           >
             {following ? "Following" : "Follow"}
           </Button>
@@ -86,7 +158,7 @@ export function MentorCard({ mentor }: MentorCardProps) {
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <MapPin className="h-3 w-3" />
             <span>{mentor.location}</span>
-          </div>
+          </div>         
         </div>
 
         <div className="pt-2 border-t">

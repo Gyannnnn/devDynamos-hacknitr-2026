@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Star, ExternalLink, MapPin } from "lucide-react";
+import { Star, ExternalLink, MapPin, Linkedin, Instagram } from "lucide-react";
 import { ChatDialog } from "@/components/chat-dialog";
 import FollowButton from "@/components/follow-button";
 import { ScheduleDialog } from "@/components/schedule-dialog";
@@ -159,6 +159,20 @@ export default function MentorDetailsPage() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">{mentor.about}</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>Social Links</CardHeader>
+        <CardContent className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            
+            <a href={"https://www.linkedin.com/in/higyan/"} target="_blank" rel="noopener noreferrer"><Linkedin className="h-4 w-4" /></a>
+          </div>
+          <div className="flex items-center gap-2">
+            
+            <a href={"https://www.instagram.com/gyanpatra.dev/"} target="_blank" rel="noopener noreferrer"><Instagram className="h-4 w-4" /></a>
+          </div>
         </CardContent>
       </Card>
 

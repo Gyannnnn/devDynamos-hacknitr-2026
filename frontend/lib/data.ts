@@ -28,6 +28,9 @@ export interface Mentor {
   fieldOfExpertise: string   // ✅ string, NOT union
   description: string
   about: string
+  materialLinks?: string[]
+  linkedIn?: string | null
+  instagram?: string | null
 }
 
 export type FieldOfExpertiseUI =

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,87 +9,135 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { MessageSquare, Send } from "lucide-react"
-import { Mentor } from "@/lib/data"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { MessageSquare, Send, Sparkles } from "lucide-react";
+import { Mentor } from "@/lib/data";
 
 interface ChatDialogProps {
-  mentor: Mentor
+  mentor: Mentor;
 }
 
 const dummyMessages = [
   { id: 1, sender: "mentor", text: "Hello! How can I help you today?" },
   { id: 2, sender: "student", text: "Hi! I'm looking for guidance on React hooks." },
-  { id: 3, sender: "mentor", text: "Great! React hooks are fundamental. Which specific hook would you like to learn about?" },
-]
+  { id: 3, sender: "mentor", text: "Which hook are you interested in?" },
+];
 
 export function ChatDialog({ mentor }: ChatDialogProps) {
-  const [messages, setMessages] = useState(dummyMessages)
-  const [input, setInput] = useState("")
-  const [open, setOpen] = useState(false)
-  const [isFollowing, setIsFollowing] = useState(false)
+  const [messages, setMessages] = useState(dummyMessages);
+  const [input, setInput] = useState("");
+  const [open, setOpen] = useState(false);
 
-  const toggleFollow = () => setIsFollowing((v) => !v)
+  const [summary, setSummary] = useState("");
+  const [loadingSummary, setLoadingSummary] = useState(false);
 
   const handleSend = () => {
-    if (!input.trim()) return
-    setMessages([...messages, { id: messages.length + 1, sender: "student", text: input }])
-    setInput("")
-    // Simulate mentor response
+    if (!input.trim()) return;
+
+    setMessages((prev) => [
+      ...prev,
+      { id: prev.length + 1, sender: "student", text: input },
+    ]);
+    setInput("");
+
     setTimeout(() => {
       setMessages((prev) => [
         ...prev,
-        { id: prev.length + 1, sender: "mentor", text: "Thanks for your message! I'll get back to you soon." },
-      ])
-    }, 1000)
-  }
+        {
+          id: prev.length + 1,
+          sender: "mentor",
+          text: "Thanks for your message! I'll guide you.",
+        },
+      ]);
+    }, 800);
+  };
+
+  const summarizeChat = async () => {
+    setLoadingSummary(true);
+
+    const formattedMessages = messages.map(
+      (m) => `${m.sender === "student" ? "Student" : "Mentor"}: ${m.text}`
+    );
+
+    const res = await fetch("/api/summarize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: formattedMessages }),
+    });
+
+    const data = await res.json();
+    setSummary(data.summary);
+    setLoadingSummary(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <div className="w-full">
-        <DialogTrigger asChild>
-          <Button className="w-full sm:w-auto">
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Chat with Mentor
+      <DialogTrigger asChild>
+        <Button>
+          <MessageSquare className="h-4 w-4 mr-2" />
+          Chat with Mentor
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="max-w-2xl h-[90vh] flex flex-col">
+        {/* HEADER */}
+        <DialogHeader className="flex flex-row justify-between items-center">
+          <div>
+            <DialogTitle>Chat with {mentor.name}</DialogTitle>
+            <DialogDescription>
+              Ask questions and get guidance
+            </DialogDescription>
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={summarizeChat}
+            disabled={messages.length < 3 || loadingSummary}
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            {loadingSummary ? "Summarizing..." : "Summarize"}
           </Button>
-        </DialogTrigger>
-      </div>
-      <DialogContent className="max-w-2xl h-screen flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Chat with {mentor.name}</DialogTitle>
-          <DialogDescription>
-            Send a message to {mentor.name} for guidance
-          </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-          {messages.map((message) => (
+
+        {/* SUMMARY */}
+        {summary && (
+          <div className="mb-3 rounded border bg-muted p-3 text-sm">
+            <strong>Chat Summary</strong>
+            <pre className="whitespace-pre-wrap mt-1">{summary}</pre>
+          </div>
+        )}
+
+        {/* MESSAGES */}
+        <div className="flex-1 overflow-y-auto space-y-3">
+          {messages.map((m) => (
             <div
-              key={message.id}
-              className={`flex ${message.sender === "student" ? "justify-end" : "justify-start"}`}
+              key={m.id}
+              className={`flex ${
+                m.sender === "student" ? "justify-end" : "justify-start"
+              }`}
             >
               <div
-                className={`max-w-[80%] rounded-lg p-3 ${
-                  message.sender === "student"
+                className={`max-w-[75%] rounded-lg p-3 text-sm ${
+                  m.sender === "student"
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted"
                 }`}
               >
-                <p className="text-sm">{message.text}</p>
+                {m.text}
               </div>
             </div>
           ))}
         </div>
-        <div className="flex gap-2">
+
+        {/* INPUT */}
+        <div className="flex gap-2 pt-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSend()
-              }
-            }}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
           />
           <Button onClick={handleSend} size="icon">
             <Send className="h-4 w-4" />
@@ -97,6 +145,5 @@ export function ChatDialog({ mentor }: ChatDialogProps) {
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-

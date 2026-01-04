@@ -22,6 +22,9 @@ type Mentor = {
   fieldOfExpertise: string;
   about: string;
   description: string;
+  materialLinks?: string[];
+  linkedIn?: string | null;
+  instagram?: string | null;
 };
 
 type ApiResponse = {
