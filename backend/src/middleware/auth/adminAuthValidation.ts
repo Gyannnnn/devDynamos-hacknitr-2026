@@ -24,7 +24,9 @@ export const adminAuthValidation = (
     if (!secret) {
       throw new Error("JWT_SECRET not set in environment variables");
     }
-
+    if (!token) {
+  throw new Error("Token missing");
+}
     const decoded = jwt.verify(token, secret) as JwtPayload;
 
 
